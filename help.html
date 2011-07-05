@@ -1,0 +1,156 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>JS Proxy Document</title>
+        <style type="text/css" media="screen">
+            *{margin:0;padding:0;}
+            body{ text-align:center; font-family:futura,arial,sans-serif;}
+            .content{ width:800px;margin:0 auto;padding:20px 0;font-size:14px; text-align:left;line-height:1.5;}
+            h1{padding:10px 0;}
+            h2{padding:10px 0;font-size:11px;color:#777;font-weight:400;}
+            h4{border-bottom:2px #000 solid;padding-top:20px;}
+            li{margin:20px 0;}
+            pre{ font-family:"Courier New",monospace;padding:5px 10px;background:#efefef;border:1px dotted #999;margin:10px 0;}
+            a{color:#333;text-decoration:none;border-bottom:1px #666 dotted;}
+        </style>
+    </head>
+    <body>
+        <h1>JS Proxy</h1>
+        <h2>zhengxin@baidu.com</h2>
+        <div class="content">
+            <h4>使用方式</h4>
+            <p>
+                <pre>
+git clone git://github.com/demix/JsProxy.git                    
+                </pre>
+                到php运行目录下
+            </p>
+            <ol>
+                <li>
+                    <p>直接输出文件：</p>
+                    <pre>
+php proxy.php package_name build_file replace_type
+                    </pre>
+                    <p>
+                        <br/>
+                        说明：<br/>
+                        此命令将生成一个指定包的js文件<br/>
+                        package_name 为包名，对应manifest.json内声明的sources的属性名<br/>
+                        build_file 为输出文件名<br/>
+                        replace_type 为replace token置换目标对象，对应manifest.json内声明的replaec的属性名，默认为online<br/>
+                    </p>
+                </li>
+                <li>
+                    <p>输出全部文件：</p>
+                    <pre>
+php proxy.php '*' build_dir replace_type
+                    </pre>
+                    <p>
+                        <br/>
+                        说明：<br/>
+                        此命令将生成所有声明的包为js文件<br/>
+                        '*'不可写作*<br/>
+                        build_dir 为生成文件的目标文件夹<br/>
+                        replace_type 为replace token置换目标对象，对应manifest.json内声明的replaec的属性名，默认为online<br/>
+                    </p>
+                </li>
+                <li>
+                    <p>作为脚本引入：</p>
+                    <pre>
+&lt;script src="xxxxx/proxy.php?s=#{packge_name}&replace=#{replace_type}"&gt;&lt;/script&gt;
+                    </pre>
+                    <p>
+                        <br/>
+                        说明：<br/>
+                        此命令将生成指定包的js文件直接输出<br/>
+                        package_name 为包名，对应manifest.json内声明的sources的属性名<br/>
+                        replace_type 为replace token置换目标对象，对应manifest.json内声明的replaec的属性名，默认为online<br/>
+                        <a href="proxy.php?s=boot&replace=local" target="_blank">示例</a><br/>
+                    </p>
+                </li>
+            </ol>
+
+            <h4>manifest.json声明属性</h4>
+            <ol>
+                <li>
+                    <p>sources(必需)</p>
+                    <p>type:object</p>
+                    <pre>
+    "sources":{
+        "package_name":[
+            "file_name1"
+            ,"file_name2"
+        ],
+        "package_name2":[
+            "file_name3"
+        ]
+    }
+                    </pre>
+                </li>
+                <li>
+                    <p>replace</p>
+                    <p>type:object</p>
+                    <p>token: %#xxx#%，将替换文件中%##%中间的字符</p>
+                    <pre>
+    "replace":{
+        "replace_type":{
+            "token1":"url1",
+            "token2":"url2",
+            "token3":"url3"
+        }
+    }                        
+                    </pre>
+                </li>
+                <li>
+                    <p>页面注入CSS</p>
+                    <p>函数可以参考  <a href="lib/css_inject.js">示例</a>，proxy将声明的css文件读出来以函数参数加入到目标js文件最后一行。</p>
+                    <pre>
+    "css":{
+        "method":"baidu.phoenix.addCss",
+        "js_package_name":[
+            "css_file"
+        ]
+    }
+                    </pre>
+                    <p>method为公开的CSS注入方法</p>
+                </li>
+
+                <li>
+                    <p>注入文件</p>
+                    <p>name: file_inject</p>
+                    <p>type:object</p>
+                    <pre>
+    "file_inject":{
+        "file1":"example/inject.js"
+    }
+                    </pre>
+                    <p>将页面中#%xxx%#的内容，映射到file_inject[xxx]获取文件url，将文件输出到该处替换</p>
+                    <p><a href="http://db-log02.db01.baidu.com/~zhengxin/adoc/proxy/proxy.php?s=inject" target="_blank">示例</a></p>
+                </li>
+                <li>
+                    <p>js模板</p>
+                    <p>可以为每一个js套用固定的模板，这在框架级别的编程中非常有用</p>
+                    <p>name: parent</p>
+                    <p>type:string</p>
+                    <pre>
+    "parent":"example/parent.js",
+                    </pre>
+                    <p>将所有声明了@template的js中@define xxx name声明的变量替换到parent指定##xxx##的地方</p>
+                    <p><a href="http://db-log02.db01.baidu.com/~zhengxin/adoc/proxy/proxy.php?s=yui" target="_blank">示例</a></p>
+                </li>
+            </ol>
+            <h4>自动化</h4>
+            <ol>
+                <li>
+                    <p>自动化语法检查</p>
+                    <p>JsProxy 内置了google closure linter语法检查。当使用命令行build文件时将输出error。</p>
+                </li>
+                <li>
+                    <p>自动JsDoc文档生成</p>
+                    <p>当使用命令行build且输出全部文件时，将自动生成JsDoc生成在doc目录下。</p>
+                </li>
+            </ol>
+        </div>
+    </body>
+</html>

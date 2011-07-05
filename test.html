@@ -1,0 +1,19 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Test for phoenix sdk</title>
+    </head>
+    <body>
+
+        <script type="text/javascript" src="proxy.php?replace=local&s=boot"></script> 
+        <script type="text/javascript">
+            baidu.phoenix.require(['renren','*'] , {
+               onAfterRender: function(){},
+               html:{
+
+               }
+            });
+        </script>
+    </body>
+</html>
