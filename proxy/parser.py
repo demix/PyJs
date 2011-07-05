@@ -3,6 +3,8 @@
  
 import re
 import codecs
+import utils
+import os
 
 
 class Parser():
@@ -20,10 +22,10 @@ class Parser():
         self._getManifest()
 
 
-        self._js = ''
-        self._css = ''
+        self._js = {}
+        self._css = {}
 
-        self.parseJs()
+        self.parseJs(self._package)
         self.replace()
 
         
@@ -35,16 +37,21 @@ class Parser():
             self._encoding = self._manifest['charset']
         
 
-    def parseJs(self):
+    def parseJs(self , package):
         """
         """
-        if( self._package == '*' ):
-            print 1
+        if( package == '*' ):
+            for i in self._manifest['sources']:
+                self.parseJs(i)
         else:
-            package = self._manifest['sources'][self._package]
-            for i in package:
+            files = self._manifest['sources'][package]
+            for i in files:
                 f = codecs.open(i , 'r' , self._encoding)
-                self._js = self._js + f.read()
+
+                if not package in self._js:
+                    self._js[package] = ''
+                
+                self._js[package] = self._js[package] + f.read()
                 f.close()
                 
     def replace(self,):
@@ -57,21 +64,45 @@ class Parser():
             """
             return replace_targets[match.group(1)]
 
-        self._js = Parser.REPLACE_TOKEN.sub(_replace , self._js)
+        for i in self._js:
+            self._js[i] = Parser.REPLACE_TOKEN.sub(_replace , self._js[i])
 
 
 
-    def getFile(self):
+    def getFiles(self):
         return self._js
 
-    def write(self , file):
+    def getFile(self , package):
         """
         
         Arguments:
         - `self`:
         """
-        f = codecs.open(file , 'w' , self._encoding)
-        f.write(self._js)
-        f.close()
+        if package in self._js:
+            return self._js[package]
+
+
+    def write(self , file , package=None):
+        """
+        
+        Arguments:
+        - `self`:
+        """
+        if package == None:
+            package = self._package
+            
+        if package == '*':
+            utils.rm(file)
+            os.mkdir(file)
+            
+            for i in self._js:
+                self.write(os.path.basename(file) + os.sep + i + '.js' , i)
+                
+
+            
+        else:
+            f = codecs.open(file , 'w' , self._encoding)
+            f.write(self._js[package])
+            f.close()
 
 
