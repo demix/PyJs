@@ -160,10 +160,18 @@ class Parser():
                 self.write(os.path.basename(tfile) + os.sep + i + '.js' , i)
                 
 
-            
+            self.jsdoc( tfile )
         else:
             f = codecs.open(tfile , 'w' , self._encoding)
             f.write(self.getFile(package))
             f.close()
+            self.lint(tfile)
 
 
+    def lint(self , file):
+        os.system('python tools/closure_linter/gjslint.py --nojsdoc '  + file);
+
+
+    def jsdoc(self , dir):
+        print 'jsdoc ing...'
+        os.system('java -jar tools/jsdoc/jsrun.jar tools/jsdoc/app/run.js -a -t=tools/jsdoc/templates/jsdoc -d=doc ' + dir)

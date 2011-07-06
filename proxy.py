@@ -55,3 +55,5 @@ if __name__ == '__main__':
             target = args[2]
             p = proxy.parser.Parser(manifest , args[1] , args[3])
         p.write(target)
+
+        
