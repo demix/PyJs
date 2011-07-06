@@ -80,7 +80,7 @@ class PrHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
                 if os.path.exists(index_file):
                     return (200, 'text/html', open(index_file).read())
                 else:
-                    return (200 , 'text/html' , self.list_directory(os.path.abspath(file_path)).read())
+                    return (200 , 'text/html; charset=utf-8' , self.list_directory(os.path.abspath(file_path)).read().encode('utf-8'))
             else:
                 return (301, 'text/html', file_path + '/')
         else:
