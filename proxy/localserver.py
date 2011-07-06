@@ -16,7 +16,7 @@ import parser
 PATH = ''
 PORT = 8150
 manifest = None
-
+encoding = 'utf-8'
 
 class PrHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
     """
@@ -24,7 +24,7 @@ class PrHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
     def sendResponseWithOutput(self, response, contentType, body):
         """
         handles both str and unicode types
-        """        
+        """
         self.send_response(response)
         self.send_header("Content-Type", contentType)
         self.send_header("Content-Length", len(body))
@@ -43,7 +43,8 @@ class PrHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         truncate_path = self.path.split('?')[0].split('#')[0]
         response = 200
         if truncate_path.endswith('.pr'):
-            contentType = 'application/javascript'
+            global encoding
+            contentType = 'application/javascript; charset='+encoding
             package = re.search('\/(\w+?)\.pr' , truncate_path)
             package = package.group(1)
 
@@ -51,39 +52,39 @@ class PrHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 
             p = parser.Parser(manifest , package , 'local')
 
-            body = p.getFile(package)
+            body = p.getFile(package).encode(encoding)
         else:
-            response, contentType, body = server_static(truncate_path) 
+            response, contentType, body = self.server_static(truncate_path) 
         self.sendResponseWithOutput(response , contentType , body)
            
         
 
-def server_static(file_path):
-    file_path = '.' + file_path
-    if not os.path.exists(file_path):
-        return (404, 'text/html', 'no such file, may be your forget add /doc/, for example "/doc/' + file_path + '"')
+    def server_static(self,file_path):
+        file_path = '.' + file_path
+        if not os.path.exists(file_path):
+            return (404, 'text/html', 'no such file, may be your forget add /doc/, for example "/doc/' + file_path + '"')
     
-    if os.path.isfile(file_path):
-        stat_result = os.stat(file_path)    
-        mime_type, encoding = mimetypes.guess_type(file_path)
+        if os.path.isfile(file_path):
+            stat_result = os.stat(file_path)    
+            mime_type, encoding = mimetypes.guess_type(file_path)
 
-        file = open(file_path, "rb")
-        try:
-            return (200, mime_type, file.read())
-        finally:
-            file.close()
+            file = open(file_path, "rb")
+            try:
+                return (200, mime_type, file.read())
+            finally:
+                file.close()
             
-    elif os.path.isdir(file_path):
-        if file_path.endswith('/'):
-            index_file = os.path.join(file_path, 'index.html')
-            if os.path.exists(index_file):
-                return (200, 'text/html;', open(index_file).read())
-
-            return (200, 'text/html; charset=UTF8', file_path)
+        elif os.path.isdir(file_path):
+            if file_path.endswith('/'):
+                index_file = os.path.join(file_path, 'index.html')
+                if os.path.exists(index_file):
+                    return (200, 'text/html', open(index_file).read())
+                else:
+                    return (200 , 'text/html' , self.list_directory(os.path.abspath(file_path)).read())
+            else:
+                return (301, 'text/html', file_path + '/')
         else:
-            return (301, 'text/html', file_path + '/')
-    else:
-        pass
+            pass
 
 
 
@@ -100,7 +101,10 @@ def setManifest(m):
     - `m`:
     """
     global manifest
+    global encoding
     manifest = m
+    if( 'charset' in manifest ):
+        encoding = manifest['charset']
 
 
 def run(handler_class = PrHandler):
