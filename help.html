@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta charset="utf-8" />
-        <title>JS Proxy Document</title>
+        <title>Python JS Proxy Document</title>
         <style type="text/css" media="screen">
             *{margin:0;padding:0;}
             body{ text-align:center; font-family:futura,arial,sans-serif;}
@@ -16,21 +16,20 @@
         </style>
     </head>
     <body>
-        <h1>JS Proxy</h1>
+        <h1>Python JS Proxy</h1>
         <h2>zhengxin@baidu.com</h2>
         <div class="content">
             <h4>使用方式</h4>
             <p>
                 <pre>
-git clone git://github.com/demix/JsProxy.git                    
+git clone git://github.com/demix/PyJsProxy.git                    
                 </pre>
-                到php运行目录下
             </p>
             <ol>
                 <li>
                     <p>直接输出文件：</p>
                     <pre>
-php proxy.php package_name build_file replace_type
+python proxy.py package_name build_file replace_type
                     </pre>
                     <p>
                         <br/>
@@ -44,7 +43,7 @@ php proxy.php package_name build_file replace_type
                 <li>
                     <p>输出全部文件：</p>
                     <pre>
-php proxy.php '*' build_dir replace_type
+python proxy.py '*' build_dir replace_type
                     </pre>
                     <p>
                         <br/>
@@ -53,20 +52,23 @@ php proxy.php '*' build_dir replace_type
                         '*'不可写作*<br/>
                         build_dir 为生成文件的目标文件夹<br/>
                         replace_type 为replace token置换目标对象，对应manifest.json内声明的replaec的属性名，默认为online<br/>
+                        对于上线编译可直接写作
                     </p>
+                    <pre>
+python proxy.py 
+                    </pre>
                 </li>
                 <li>
-                    <p>作为脚本引入：</p>
+                    <p>运行本地Server：</p>
                     <pre>
-&lt;script src="xxxxx/proxy.php?s=#{packge_name}&replace=#{replace_type}"&gt;&lt;/script&gt;
+python proxy.py runserver
                     </pre>
                     <p>
                         <br/>
                         说明：<br/>
-                        此命令将生成指定包的js文件直接输出<br/>
-                        package_name 为包名，对应manifest.json内声明的sources的属性名<br/>
-                        replace_type 为replace token置换目标对象，对应manifest.json内声明的replaec的属性名，默认为online<br/>
-                        <a href="proxy.php?s=boot&replace=local" target="_blank">示例</a><br/>
+                        此命令将在本地直接运行一个简单服务器<br/>
+                        对于以.pr结尾的文件，将视为包获取，编译包之后返回，replace为local<br/>
+                        其它文件直接返回<br/>
                     </p>
                 </li>
             </ol>
@@ -126,7 +128,6 @@ php proxy.php '*' build_dir replace_type
     }
                     </pre>
                     <p>将页面中#%xxx%#的内容，映射到file_inject[xxx]获取文件url，将文件输出到该处替换</p>
-                    <p><a href="http://db-log02.db01.baidu.com/~zhengxin/adoc/proxy/proxy.php?s=inject" target="_blank">示例</a></p>
                 </li>
                 <li>
                     <p>js模板</p>
@@ -137,7 +138,6 @@ php proxy.php '*' build_dir replace_type
     "parent":"example/parent.js",
                     </pre>
                     <p>将所有声明了@template的js中@define xxx name声明的变量替换到parent指定##xxx##的地方</p>
-                    <p><a href="http://db-log02.db01.baidu.com/~zhengxin/adoc/proxy/proxy.php?s=yui" target="_blank">示例</a></p>
                 </li>
             </ol>
             <h4>自动化</h4>

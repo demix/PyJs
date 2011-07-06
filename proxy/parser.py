@@ -10,6 +10,11 @@ import json
 
 class Parser():
     REPLACE_TOKEN = re.compile('%#(\w+)#%')
+    INJECT_TOKEN = re.compile('#%(\w+)%#')
+    PARENT_TOKEN = re.compile('@template')
+    DEF_TARGET_TOKEN = re.compile('##(\w+)##')
+    DEF_TOKEN = re.compile('@define\s+(\w+)\s*(\w+)\s*[\s\r\n]')
+    FILE_TOKEN = re.compile('##file##')
     """
     """
     
@@ -28,6 +33,7 @@ class Parser():
 
         self.parseJs(self._package)
         self.replace()
+        self.inject()
 
         
 
@@ -51,10 +57,33 @@ class Parser():
 
                 if not package in self._js:
                     self._js[package] = ''
-                
-                self._js[package] = self._js[package] + f.read()
+
+                file_content = f.read();
                 f.close()
+
+                if 'parent' in self._manifest and Parser.PARENT_TOKEN.search(file_content):
+                    parent_file  = codecs.open(self._manifest['parent'] , 'r' , self._encoding)
+                    parent = parent_file.read()
+                    parent_file.close()
+                    file_content = self.parseParent(parent , file_content)
+                
+                self._js[package] = self._js[package] + file_content
             self.parseCss(package)
+
+    def parseParent(self , parent , child):
+        child = Parser.FILE_TOKEN.sub(child , parent)
+        
+        defs = Parser.DEF_TOKEN.findall(child)
+
+        def _replace(match):
+            for item in defs:
+                if item[0] == match.group(1):
+                    return item[1]
+        
+        child = Parser.DEF_TARGET_TOKEN.sub(_replace , child)
+            
+        return child
+        
 
     def parseCss(self , package):
         if package in self._manifest['css']:
@@ -81,6 +110,20 @@ class Parser():
         for i in self._js:
             self._js[i] = Parser.REPLACE_TOKEN.sub(_replace , self._js[i])
 
+    def inject(self , ):
+        if not 'file_inject' in self._manifest:
+            return
+
+        def _replace(match):
+            target = match.group(1)
+            if target in self._manifest['file_inject']:
+                tfile = self._manifest['file_inject'][target]
+                f = codecs.open(tfile , 'r' , self._encoding)
+                return f.read()
+
+
+        for i in self._js:
+            self._js[i] = Parser.INJECT_TOKEN.sub(_replace , self._js[i])
 
 
     def getFiles(self):
