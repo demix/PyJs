@@ -18,13 +18,14 @@ class Parser():
     """
     """
     
-    def __init__(self , manifest , package = '*' ,  replace='online' ):
+    def __init__(self , baseDir  , package = '*' ,  replace='online' ):
         """
         """
+        self._baseDir = baseDir
         self._encoding = 'utf-8'
-        self._manifest = manifest
         self._package = package
         self._replace = replace
+        self._manifest = None
         self._getManifest()
 
 
@@ -40,8 +41,15 @@ class Parser():
     def _getManifest(self):
         """
         """
-        if 'charset' in self._manifest:
-            self._encoding = self._manifest['charset']
+        f = codecs.open(self._baseDir + 'manifest.json' , 'r' , self._encoding)
+        manifest = f.read()
+        f.close()
+        manifest = json.loads(manifest)
+
+        self._manifest = manifest
+        
+        if 'charset' in manifest:
+            self._encoding = manifest['charset']
         
 
     def parseJs(self , package):
@@ -53,7 +61,7 @@ class Parser():
         else:
             files = self._manifest['sources'][package]
             for i in files:
-                f = codecs.open(i , 'r' , self._encoding)
+                f = codecs.open(self._baseDir + i , 'r' , self._encoding)
 
                 if not package in self._js:
                     self._js[package] = ''
@@ -62,7 +70,7 @@ class Parser():
                 f.close()
 
                 if 'parent' in self._manifest and Parser.PARENT_TOKEN.search(file_content):
-                    parent_file  = codecs.open(self._manifest['parent'] , 'r' , self._encoding)
+                    parent_file  = codecs.open( self._baseDir + self._manifest['parent'] , 'r' , self._encoding)
                     parent = parent_file.read()
                     parent_file.close()
                     file_content = self.parseParent(parent , file_content)
@@ -86,10 +94,10 @@ class Parser():
         
 
     def parseCss(self , package):
-        if package in self._manifest['css']:
+        if 'css' in self._manifest and package in self._manifest['css']:
             files = self._manifest['css'][package]
             for i in files:
-                f = codecs.open(i , 'r' , self._encoding)
+                f = codecs.open(self._baseDir + i , 'r' , self._encoding)
                 if not package in self._css:
                     self._css[package] = ''
                 self._css[package] = self._css[package] + f.read()
@@ -100,6 +108,9 @@ class Parser():
     def replace(self,):
         """
         """
+        if not 'replace' in self._manifest:
+            return
+        
         replace_targets = self._manifest['replace'][self._replace]
 
         def _replace(match):
@@ -118,7 +129,7 @@ class Parser():
             target = match.group(1)
             if target in self._manifest['file_inject']:
                 tfile = self._manifest['file_inject'][target]
-                f = codecs.open(tfile , 'r' , self._encoding)
+                f = codecs.open(self._baseDir + tfile , 'r' , self._encoding)
                 return f.read()
 
 
@@ -169,9 +180,9 @@ class Parser():
 
 
     def lint(self , file):
-        os.system('python tools/closure_linter/gjslint.py --nojsdoc '  + file);
+        os.system('python '+ self._baseDir +'tools/closure_linter/gjslint.py --nojsdoc '  + file);
 
 
     def jsdoc(self , dir):
         print 'jsdoc ing...'
-        os.system('java -jar tools/jsdoc/jsrun.jar tools/jsdoc/app/run.js -a -t=tools/jsdoc/templates/jsdoc -d=doc ' + dir)
+        os.system('java -jar '+ self._baseDir +'tools/jsdoc/jsrun.jar '+ self._baseDir +'tools/jsdoc/app/run.js -a -t='+ self._baseDir +'tools/jsdoc/templates/jsdoc -d=doc ' + dir)

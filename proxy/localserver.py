@@ -9,13 +9,16 @@ import mimetypes
 import sys
 import os
 import re
-
+import codecs
+import json
+import urllib2
+import urllib
 
 import parser
 
 PATH = ''
 PORT = 8150
-manifest = None
+baseDir = None
 encoding = 'utf-8'
 
 class PrHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
@@ -33,6 +36,31 @@ class PrHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         self.end_headers()
         if response != 301:
             self.wfile.write(body)
+
+    def getServerConfig(self , encoding , baseDir):
+        path = baseDir + 'server.json'
+        if os.path.exists(path):
+            f = codecs.open(path , 'r' , encoding)
+            serverConfig = f.read()
+            f.close()
+            return json.loads(serverConfig)
+            
+
+    def urlProxy(self , url):
+        response = urllib2.urlopen(url)
+        contentType = response.info()['Content-Type']
+        body = response.read()
+        return (contentType,body)
+
+    def pluginsProxy(self , plugins , params):
+        print plugins
+        try:
+            exec("from " + plugins+" import main")
+            return main(params)
+        except:
+            return ('text/html;charset=utf-8' , "Unexpected error:"+ str(sys.exc_info()))
+        
+
     
     def do_GET(self):
         """
@@ -40,21 +68,39 @@ class PrHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         Arguments:
         - `self`:
         """
+        global encoding
+        global baseDir
         truncate_path = self.path.split('?')[0].split('#')[0]
+        path_items = self.path.split('?')
         response = 200
-        if truncate_path.endswith('.pr'):
-            global encoding
-            contentType = 'application/javascript; charset='+encoding
-            package = re.search('\/(\w+?)\.pr' , truncate_path)
-            package = package.group(1)
 
-            global manifest
 
-            p = parser.Parser(manifest , package , 'local')
+        serverConfig = self.getServerConfig(encoding , baseDir)
 
-            body = p.getFile(package).encode(encoding)
-        else:
-            response, contentType, body = self.server_static(truncate_path) 
+        isInServerConfig = False
+        for reg,target in serverConfig.items():
+            if re.search(reg , truncate_path):
+                isInServerConfig = True
+                if target.startswith('http'):#http url
+                    contentType,body =self.urlProxy(target)
+                elif target.startswith('plugins'):#local plugins
+                    path = ''
+                    if( len(path_items) >1 ):
+                        path = path_items[1]
+                    contentType , body = self.pluginsProxy(target , path)
+
+        if not isInServerConfig:
+            if truncate_path.endswith('.pr'):
+                contentType = 'application/javascript; charset='+encoding
+                package = re.search('\/(\w+?)\.pr' , truncate_path)
+                package = package.group(1)
+                
+                
+                p = parser.Parser(baseDir , package , 'local')
+                
+                body = p.getFile(package).encode(encoding)
+            else:
+                response, contentType, body = self.server_static(truncate_path) 
         self.sendResponseWithOutput(response , contentType , body)
            
         
@@ -80,7 +126,7 @@ class PrHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
                 if os.path.exists(index_file):
                     return (200, 'text/html', open(index_file).read())
                 else:
-                    return (200 , 'text/html; charset=utf-8' , self.list_directory(os.path.abspath(file_path)).read().encode('utf-8'))
+                    return (200 , 'text/html; charset=utf-8' , self.list_directory(os.path.abspath(file_path)).read().encode('utf-8')[150:])
             else:
                 return (301, 'text/html', file_path + '/')
         else:
@@ -94,17 +140,9 @@ def setpath(path):
     if os.path.exists(path):
         PATH = path
 
-def setManifest(m):
-    """
-    
-    Arguments:
-    - `m`:
-    """
-    global manifest
-    global encoding
-    manifest = m
-    if( 'charset' in manifest ):
-        encoding = manifest['charset']
+def setBaseDir(m):
+    global baseDir
+    baseDir = m
 
 
 def run(handler_class = PrHandler):
