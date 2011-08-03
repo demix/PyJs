@@ -53,7 +53,6 @@ class PrHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         return (contentType,body)
 
     def pluginsProxy(self , plugins , params):
-        print plugins
         try:
             exec("from " + plugins+" import main")
             return main(params)
