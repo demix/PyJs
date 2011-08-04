@@ -140,6 +140,22 @@ python proxy.py runserver
                     <p>将所有声明了@template的js中@define xxx name声明的变量替换到parent指定##xxx##的地方</p>
                 </li>
             </ol>
+            <h4>Local Transimission</h4>
+            <p>本地server启动后，若配置server.json，会启用请求转发。</p>
+            <p>server.json声明分为两部分，key为正则，对应匹配url请求规则；value为映射</p>
+            <ol>
+                <li>
+                    <p>映射到线上请求</p>
+                    <p>所有以http开头的都会映射到线上请求</p>
+                    <p>这里不会做权限控制等，有复杂需求使用自定义插件</p>
+                </li>
+                <li>
+                    <p>映射到本地插件</p>
+                    <p>所有以plugins开头都会映射到本地插件，对应到plugins的相应module中。</p>
+                    <p>module文件必须包含main函数，会将请求的search参数传入到main函数中。</p>
+                    <p>返回值: content-type , body</p>
+                </li>
+            </ol>
             <h4>自动化</h4>
             <ol>
                 <li>
