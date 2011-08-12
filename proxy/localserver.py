@@ -89,15 +89,18 @@ class PrHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
                     contentType , body = self.pluginsProxy(target , path)
 
         if not isInServerConfig:
-            if truncate_path.endswith('.pr'):
-                contentType = 'application/javascript; charset='+encoding
-                package = re.search('\/(\w+?)\.pr' , truncate_path)
-                package = package.group(1)
+            if truncate_path.endswith('.js'):#可能需要读取包内容
+                if os.path.exists(baseDir + truncate_path):
+                    response, contentType, body = self.server_static(truncate_path) 
+                else:
+                    
+                    contentType = 'application/javascript; charset='+encoding
+                    package = re.search('\/(\w+?)\.js' , truncate_path)
+                    package = package.group(1)
                 
-                
-                p = parser.Parser(baseDir , package , 'local')
-                
-                body = p.getFile(package).encode(encoding)
+                    p = parser.Parser(baseDir , package , 'local')
+                    
+                    body = p.getFile(package).encode(encoding)
             else:
                 response, contentType, body = self.server_static(truncate_path) 
         self.sendResponseWithOutput(response , contentType , body)

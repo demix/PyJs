@@ -2,47 +2,22 @@
     "name":"phoenix sdk",
     "version":"1.0.0.0",
     "debug":"-1",
-    "parent":"example/parent.js",
-    "sources":{
-        "all":[
-            "example/tangram.js"
-            ,"example/prelude.js"
-        ],
-        "boot":[
-            "example/boot.js"
-        ],
-        "inject":[
-            "example/inject_src.js"
-        ],
-        "yui":[
-            "example/yui.js",
-            "example/yui-dom.js"
-        ]
-    },
-    "css":{
-        "method":"baidu.phoenix.addCss",
-        "all":[
-            "example/test.css"
-        ]
-    },
+    "parent":"lib/modules.js",
+
+    "srcdir": "src",
+    "css": "baidu.phoenix.addCss",
+
     "replace":{
         "local":{
-            "all_js":"http://demix.baidu.com/baidu/phoenix/proxy.php?s=all",
-            "server_status":"http://demix.baidu.com/baidu/phoenix/ss.js",
-            "login":"http://passport.baidu.com/phoenix/account/startlogin?"
+            "js_url":"http://demix.baidu.com:8150/"
         },
         "test":{
-            "all_js":"http://bb-pass-test01.vm.baidu.com:8998/static/phoenix/scripts/jssdk/all.js?v=1.0",
-            "server_status":"http://bb-pass-test01.vm.baidu.com:8998/phoenix/account/osavailable?callback=baidu.phoenix._setIconsStatus",
-            "login":"http://passport.baidu.com/phoenix/account/startlogin?"
+            "js_url":"http://demix.baidu.com:8150/"
+
         },
-        "online":{
-            "all_js":"http://passport.baidu.com/static/phoenix/scripts/jssdk/all.js?v=1.0",
-            "server_status":"http://passport.baidu.com/phoenix/account/osavailable?callback=baidu.phoenix._setIconsStatus",
-            "login":"http://passport.baidu.com/phoenix/account/startlogin?"
+        "online":{ 
+            "js_url":"http://demix.baidu.com:8150/"
         }
-    },
-    "file_inject":{
-        "file1":"example/inject.js"
     }
+
 }

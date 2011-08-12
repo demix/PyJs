@@ -42,5 +42,3 @@ if __name__ == '__main__':
             target = args[2]
             p = proxy.parser.Parser(BASE_DIR , args[1] , args[3])
         p.write(target)
-
-        
