@@ -1,23 +1,17 @@
 {
-    "name":"phoenix sdk",
+    "name":"",
     "version":"1.0.0.0",
-    "debug":"-1",
     "parent":"lib/modules.js",
-
-    "srcdir": "src",
-    "css": "baidu.phoenix.addCss",
-
+    "pyjsdir": "src",
     "replace":{
         "local":{
             "js_url":"http://demix.baidu.com/PyJsProxy/build/"
         },
         "test":{
             "js_url":"http://demix.baidu.com:8150/"
-
         },
         "online":{ 
             "js_url":"http://demix.baidu.com/PyJsProxy/build/"
         }
     }
-
 }

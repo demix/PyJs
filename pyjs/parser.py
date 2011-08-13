@@ -53,8 +53,8 @@ class Parser():
         if 'charset' in manifest:
             self._encoding = manifest['charset']
 
-        if 'srcdir' in manifest:
-            self._srcDir = manifest['srcdir'] + os.sep
+        if 'pyjsdir' in manifest:
+            self._srcDir = manifest['pyjsdir'] + os.sep
         else:
             self._srcDir = 'src/'
         
