@@ -15,7 +15,7 @@ exports.VERSION = '2.0';
 
 exports.name = 'PyJsProxy';
 
-exports.url = 'http://demix.baidu.com/PyJsProxy/build/';
+exports.url = 'http://demix.baidu.com/PyJs/build/';
 exports.init = function(){
     alert(1);
 };
@@ -25,6 +25,7 @@ exports.init = function(){
 
 var name = require('main');    
 var name2 = require('main');    
+require('math')
 
 exports.VERSION = '2.0';
 

@@ -237,7 +237,7 @@ class Parser():
             temp_str = re.sub( '##dependence##' , ','.join(value) , temp_str )
             boot = boot + temp_str
 
-        f = codecs.open(self._baseDir + 'lib/package.js' , 'r' , self._encoding)
+        f = codecs.open(self._baseDir + 'lib/pyjs.js' , 'r' , self._encoding)
         boot = f.read() + '\n' + boot
         f.close()
 

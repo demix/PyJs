@@ -1,6 +1,6 @@
 /*
- * package.js
- * A js toolkit for PyJsDoc
+ * pyjs.js
+ * A js toolkit for PyJs
  * @author demixcn@gmail.com
  */
 
@@ -9,12 +9,10 @@
     
     var BUILD = '20110813';
     var COMBO_URL = "";
-    var VERSION = '1.0.0.0';
-    
+    var VERSION = '0.1.1';
     var isIE = /*@cc_on!@*/false;
     
     var page_modules = {};
-    
     var dependencies = {};
     
     var getXHR = function(){
@@ -115,10 +113,6 @@
         }
     };
 
-    var define = function(module , declare){
-        page_modules[module] = declare;
-    };
-    
     var getBuildFile = function(md , cb){
         var deps = getDependence(md);
         if( COMBO_URL.length ){//有combo的情况
@@ -131,10 +125,11 @@
             });
         }else{
             for( var i =0, l= deps.length ; i<l ; i++ ){
-                deps[i] = 'http://demix.baidu.com/PyJsProxy/build/'  + deps[i] + '.js';
+                deps[i] = 'http://demix.baidu.com/PyJs/build/'  + deps[i] + '.js';
             }
             
             var getAllScript = function(){
+                console.log(deps)
                 if( deps.length ){
                     var url = deps.shift();
                     getXdScript(url , function(){
@@ -151,6 +146,22 @@
         }
     };
 
+    /**
+     * 定义模块
+     * @function
+     * @param {String} module 定义的模块名
+     * @param {Function} declare 模块的构造函数
+     */
+    var define = function(module , declare){
+        page_modules[module] = declare;
+    };
+    
+    /**
+     * 获取模块
+     * @function
+     * @param {String} md 要获取的模块名
+     * @param {Function} cb 模块内部的require不需要写cb，页面运行时调用请使用cb
+     */
     var require = function(md , cb){
 
         var callback = function(){
@@ -207,5 +218,7 @@
 })(this);
 
 
-addDependence('core' , 'main');
+addDependence('core' , 'main,math');
 addDependence('main' , '');
+addDependence('increment' , 'math');
+addDependence('math' , '');
