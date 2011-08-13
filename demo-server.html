@@ -8,9 +8,10 @@
 
         <script type="text/javascript" src="lib/package.js"></script>
         <script type="text/javascript">
-            var a = require('core');
-            alert(a.name);
-            alert(a.main)
+var inc = require('increment').increment;
+var a = 1;
+alert(inc(a)); // 2
+
         </script>
     </body>
 </html>
