@@ -9,14 +9,14 @@
 
     "replace":{
         "local":{
-            "js_url":"http://demix.baidu.com:8150/"
+            "js_url":"http://demix.baidu.com/PyJsProxy/build/"
         },
         "test":{
             "js_url":"http://demix.baidu.com:8150/"
 
         },
         "online":{ 
-            "js_url":"http://demix.baidu.com:8150/"
+            "js_url":"http://demix.baidu.com/PyJsProxy/build/"
         }
     }
 

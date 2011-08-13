@@ -9,7 +9,7 @@ import codecs
 import os
 
 
-import proxy
+import pyjs
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))  + os.sep
 
@@ -23,22 +23,22 @@ if __name__ == '__main__':
 
     
     if len(args) >1 and args[1] == 'runserver':
-        proxy.localserver.setpath(BASE_DIR)
-        proxy.localserver.setBaseDir(BASE_DIR)
-        proxy.localserver.run()
+        pyjs.localserver.setpath(BASE_DIR)
+        pyjs.localserver.setBaseDir(BASE_DIR)
+        pyjs.localserver.run()
     else:
         if len(args) == 1:
             target = 'build'
-            p = proxy.parser.Parser(BASE_DIR )
+            p = pyjs.parser.Parser(BASE_DIR )
         elif len(args) == 2:
             if args[1] != '*':
                 raise Exception('A source must specify build file')
             target = 'build'
-            p = proxy.parser.Parser(BASE_DIR  ,  args[1])
+            p = pyjs.parser.Parser(BASE_DIR  ,  args[1])
         elif len(args) == 3:
             target = args[2]
-            p = proxy.parser.Parser(BASE_DIR , args[1] )
+            p = pyjs.parser.Parser(BASE_DIR , args[1] )
         elif len(args) == 4:
             target = args[2]
-            p = proxy.parser.Parser(BASE_DIR , args[1] , args[3])
+            p = pyjs.parser.Parser(BASE_DIR , args[1] , args[3])
         p.write(target)
