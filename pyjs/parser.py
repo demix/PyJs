@@ -13,7 +13,7 @@ class Parser():
     REPLACE_TOKEN = re.compile('%#(\w+)#%')
     INJECT_TOKEN = re.compile('#%(\w+)%#')
     DEF_TARGET_TOKEN = re.compile('##(\w+)##')
-    FILE_TOKEN = re.compile('##file##')
+
     PACKAGE_FILE = "__init__.js"
     BOOT_FILE = "boot.js"
     REQUIRE_TOKEN = re.compile("require\([\'\"](\w+)[\'\"]\)")
@@ -36,7 +36,7 @@ class Parser():
 
         self.parseJs(self._package)
         self.replace()
-        self.inject()
+        #self.inject()
 
         
 
@@ -79,7 +79,7 @@ class Parser():
                 self._js[package] = ''
                 
             if os.path.isfile(targetDir+package + '.js'):
-                f = codecs.open(targetDir + package + '.js')
+                f = codecs.open(targetDir + package + '.js' , 'r' , self._encoding)
                 file_content = file_content + '\n' + f.read()
                 f.close()
                 file_content = self.parseParent( file_content , package )
@@ -92,15 +92,20 @@ class Parser():
                     return
 
                 
-                initFile = codecs.open(targetDir + Parser.PACKAGE_FILE)
+                initFile = codecs.open(targetDir + Parser.PACKAGE_FILE , 'r' , self._encoding)
                 initFileSource = initFile.read();
                 initFile.close();
 
                 exec(initFileSource)
 
+                f = codecs.open(self._baseDir + 'lib/pkg_tpl.js' , 'r' , self._encoding)
+                pkg_tpl = f.read()
+                f.close()
+
+
                 for i in __all__:
-                    f = codecs.open(targetDir + i + '.js')
-                    file_content = file_content + '\n' + f.read()
+                    f = codecs.open(targetDir + i + '.js' , 'r' , self._encoding)
+                    file_content = file_content + '\n' + pkg_tpl.replace('##file##' , f.read())
                     f.close()
 
                 if not '__unextends__' in locals().keys() or  not __unextends__:  #继承
@@ -119,8 +124,8 @@ class Parser():
         parent_file.close()
         #保留字
         defs['package'] = package
-        
-        child = Parser.FILE_TOKEN.sub(child , parent)
+
+        child = parent.replace( '##file##' , child )
 
         def _replace(match):
             for item,value in defs.items():
@@ -233,8 +238,8 @@ class Parser():
 
         boot = ''
         for item,value in dependency.items():
-            temp_str = re.sub( '##package##' , item , dep_tpl  )
-            temp_str = re.sub( '##dependence##' , ','.join(value) , temp_str )
+            temp_str = dep_tpl.replace('##package##' , item)  
+            temp_str = temp_str.replace( '##dependence##' ) , ','.join(value) 
             boot = boot + temp_str
 
         f = codecs.open(self._baseDir + 'lib/pyjs.js' , 'r' , self._encoding)
@@ -242,15 +247,15 @@ class Parser():
         f.close()
 
         #替换build
-        boot = re.sub('##build##' ,  time.strftime('%Y%m%d') , boot);
+        boot = boot.replace( '##build##' , time.strftime('%Y%m%d') ) ;
 
         #替换combourl
         combo_url = ''
         if 'combo' in self._manifest:
             combo_url = self._manifest['combo']['combo_url']
-            
-        boot = re.sub('##combo_url##' ,  combo_url , boot);
-        boot = re.sub('##version##' ,  self._manifest['version'] , boot);
+
+        boot = boot.replace('##combo_url##' , combo_url)
+        boot = boot.replace('##version##' , self._manifest['version'])
         boot = self.replace(boot)
 
         f = codecs.open(tdir + os.sep + 'boot.js' , 'w' , self._encoding)
