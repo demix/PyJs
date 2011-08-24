@@ -31,14 +31,6 @@ if __name__ == '__main__':
             target = 'build'
             p = pyjs.parser.Parser(BASE_DIR )
         elif len(args) == 2:
-            if args[1] != '*':
-                raise Exception('A source must specify build file')
             target = 'build'
-            p = pyjs.parser.Parser(BASE_DIR  ,  args[1])
-        elif len(args) == 3:
-            target = args[2]
-            p = pyjs.parser.Parser(BASE_DIR , args[1] )
-        elif len(args) == 4:
-            target = args[2]
-            p = pyjs.parser.Parser(BASE_DIR , args[1] , args[3])
+            p = pyjs.parser.Parser(BASE_DIR , '*'  ,  args[1])
         p.write(target)

@@ -239,7 +239,7 @@ class Parser():
         boot = ''
         for item,value in dependency.items():
             temp_str = dep_tpl.replace('##package##' , item)  
-            temp_str = temp_str.replace( '##dependence##' ) , ','.join(value) 
+            temp_str = temp_str.replace( '##dependence##'  , ','.join(value) )
             boot = boot + temp_str
 
         f = codecs.open(self._baseDir + 'lib/pyjs.js' , 'r' , self._encoding)
