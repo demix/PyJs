@@ -1,10 +1,11 @@
-## PyJsProxy Project
-### author: demixcn@gmail.com
+PyJs Javascript FrameWork
+=========================
 
-A python js proxy online or js packer offline.
+A commonjs like js framework base on Python.
 
 See help.html for more information.
 
-Hard Working!
+[doc](http://demix.github.com/pyjs/)
 
-Support local server!
+[intro](http://www.cnblogs.com/demix/tag/pyjs/)
+
