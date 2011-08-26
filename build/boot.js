@@ -7,7 +7,7 @@
 
 (function(ns){
     
-    var BUILD = '20110813';
+    var BUILD = '20110826';
     var COMBO_URL = "";
     var VERSION = '0.1.1';
     var isIE = /*@cc_on!@*/false;
@@ -156,6 +156,9 @@
         page_modules[module] = declare;
     };
     
+    var required_modules = {};
+
+    
     /**
      * 获取模块
      * @function
@@ -167,8 +170,10 @@
         var callback = function(){
             var declare = page_modules[md];
             var exports = {};
-            var module = '';
+            var module = {};
+            module.id = md;
             declare(require , exports , module );
+            required_modules[md] = exports;
             if( cb ){
                 cb(exports);
             }else{
@@ -176,6 +181,9 @@
             }
         
         };
+        if( required_modules[md] ){
+            return required_modules[md];
+        }
         
         if( !page_modules[md] ){
             if( +BUILD>0 ){//编译之后

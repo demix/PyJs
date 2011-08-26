@@ -218,13 +218,13 @@ class Parser():
                 self.write(os.path.basename(tfile) + os.sep + i + '.js' , i)
                 
 
-            self.jsdoc( tfile )
+            #self.jsdoc( tfile )
             self.addboot( tfile )
         else:
             f = codecs.open(tfile , 'w' , self._encoding)
             f.write(self.getFile(package))
             f.close()
-            self.lint(tfile)
+            #self.lint(tfile)
 
     def addboot(self , tdir):
         dependency = {}
