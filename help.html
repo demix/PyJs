@@ -5,7 +5,7 @@
         <title>Python JS Proxy Document</title>
         <style type="text/css" media="screen">
             *{margin:0;padding:0;}
-            body{ text-align:center; font-family:futura,arial,sans-serif;}
+            body{ text-align:center; font-family:futura,Tahoma,arial,sans-serif;}
             .content{ width:800px;margin:0 auto;padding:20px 0;font-size:14px; text-align:left;line-height:1.5;}
             h1{padding:10px 0;}
             h2{padding:10px 0;font-size:11px;color:#777;font-weight:400;}
@@ -13,82 +13,61 @@
             li{margin:20px 0;}
             pre{ font-family:"Courier New",monospace;padding:5px 10px;background:#efefef;border:1px dotted #999;margin:10px 0;}
             a{color:#333;text-decoration:none;border-bottom:1px #666 dotted;}
+            .footer{border-top:1px #000 solid; font-size:11px;padding:10px 0;margin-top:40px;text-align:center;}
         </style>
     </head>
     <body>
-        <h1>Python JS Proxy</h1>
-        <h2>zhengxin@baidu.com</h2>
+        <h1>PyJs</h1>
+        <h2>demixcn@gmail.com</h2>
         <div class="content">
-            <h4>使用方式</h4>
-            <p>
-                <pre>
-git clone git://github.com/demix/PyJsProxy.git                    
-                </pre>
-            </p>
+            <h4>介绍</h4>
+            <p><a href="https://github.com/demix/PyJs">项目地址</a></p>
+            <p>PyJs是一种浏览器端的CommonJs实现</p>
+            <p>PyJs特别适用于一些只有静态文件构成的项目，最佳是只有js构成的项目，如baidu connect sdk.</p>
+
+            <h4>使用</h4>
             <ol>
                 <li>
-                    <p>直接输出文件：</p>
-                    <pre>
-python proxy.py package_name build_file replace_type
-                    </pre>
-                    <p>
-                        <br/>
-                        说明：<br/>
-                        此命令将生成一个指定包的js文件<br/>
-                        package_name 为包名，对应manifest.json内声明的sources的属性名<br/>
-                        build_file 为输出文件名<br/>
-                        replace_type 为replace token置换目标对象，对应manifest.json内声明的replaec的属性名，默认为online<br/>
-                    </p>
+                    <p>pyjsdir</p>
+                    <p>pyjsdir是pyjs运行的核心文件夹，所有commonjs规范的js文件，必须放在pyjsdir中，默认为src，可在manifest.json中设置。</p>
                 </li>
                 <li>
-                    <p>输出全部文件：</p>
+                    <p>本地服务器中使用pyjs</p>
+                    <p>使用
                     <pre>
-python proxy.py '*' build_dir replace_type
+python pyjs.py runserver                        
                     </pre>
-                    <p>
-                        <br/>
-                        说明：<br/>
-                        此命令将生成所有声明的包为js文件<br/>
-                        '*'不可写作*<br/>
-                        build_dir 为生成文件的目标文件夹<br/>
-                        replace_type 为replace token置换目标对象，对应manifest.json内声明的replaec的属性名，默认为online<br/>
-                        对于上线编译可直接写作
-                    </p>
-                    <pre>
-python proxy.py 
-                    </pre>
+                    启动本地服务器<br/>
+                    测试页面中引入lib/pyjs.js<br/>
+                    对于以.js结尾的文件，将查找相对路径，若相对路径下没有原文件，则搜索pyjsdir下文件或文件夹，若有文件与之相同，则编译包之后返回，replace为local。若有文件夹与去除.js部分相同，则查找文件夹下__init__.js文件，若有，按里面定义的__all__数据取出所有文件，编译之后返回。<br/>
                 </li>
                 <li>
-                    <p>运行本地Server：</p>
+                    <p>编译</p>
+                    <p>上线前，运行
                     <pre>
-python proxy.py runserver
+python pyjs.py                        
                     </pre>
-                    <p>
-                        <br/>
-                        说明：<br/>
-                        此命令将在本地直接运行一个简单服务器<br/>
-                        对于以.pr结尾的文件，将视为包获取，编译包之后返回，replace为local<br/>
-                        其它文件直接返回<br/>
-                    </p>
+                    会在build文件下生成所有commonjs模块文件。manifest中可以制定combo_url，若指定，运行编译后文件的require时，将通过combo请求文件。若没有指定，将同时加载多个js文件。<br/>
+                    文件同时会生成boot.js，里面有文件的依赖关系，线上html引用这个文件即可。
                 </li>
             </ol>
-
+            
             <h4>manifest.json声明属性</h4>
             <ol>
                 <li>
-                    <p>sources(必需)</p>
+                    <p>version</p>
+                    <p>type:string</p>
+                    <p>版本号</p>
+                </li>
+                <li>
+                    <p>pyjsdir</p>
+                    <p>type:string</p>
+                    <p>pyjs包所在的文件夹，默认为src</p>
+                </li>
+                <li>
+                    <p>combo</p>
                     <p>type:object</p>
-                    <pre>
-    "sources":{
-        "package_name":[
-            "file_name1"
-            ,"file_name2"
-        ],
-        "package_name2":[
-            "file_name3"
-        ]
-    }
-                    </pre>
+                    <p>设置combo，属性combo_url标志combo目标url</p>
                 </li>
                 <li>
                     <p>replace</p>
@@ -103,41 +82,6 @@ python proxy.py runserver
         }
     }                        
                     </pre>
-                </li>
-                <li>
-                    <p>页面注入CSS</p>
-                    <p>函数可以参考  <a href="lib/css_inject.js">示例</a>，proxy将声明的css文件读出来以函数参数加入到目标js文件最后一行。</p>
-                    <pre>
-    "css":{
-        "method":"baidu.phoenix.addCss",
-        "js_package_name":[
-            "css_file"
-        ]
-    }
-                    </pre>
-                    <p>method为公开的CSS注入方法</p>
-                </li>
-
-                <li>
-                    <p>注入文件</p>
-                    <p>name: file_inject</p>
-                    <p>type:object</p>
-                    <pre>
-    "file_inject":{
-        "file1":"example/inject.js"
-    }
-                    </pre>
-                    <p>将页面中#%xxx%#的内容，映射到file_inject[xxx]获取文件url，将文件输出到该处替换</p>
-                </li>
-                <li>
-                    <p>js模板</p>
-                    <p>可以为每一个js套用固定的模板，这在框架级别的编程中非常有用</p>
-                    <p>name: parent</p>
-                    <p>type:string</p>
-                    <pre>
-    "parent":"example/parent.js",
-                    </pre>
-                    <p>将所有声明了@template的js中@define xxx name声明的变量替换到parent指定##xxx##的地方</p>
                 </li>
             </ol>
             <h4>Local Transimission</h4>
@@ -156,7 +100,7 @@ python proxy.py runserver
                     <p>返回值: content-type , body</p>
                 </li>
             </ol>
-            <h4>自动化</h4>
+<!--            <h4>自动化</h4>
             <ol>
                 <li>
                     <p>自动化语法检查</p>
@@ -166,7 +110,10 @@ python proxy.py runserver
                     <p>自动JsDoc文档生成</p>
                     <p>当使用命令行build且输出全部文件时，将自动生成JsDoc生成在doc目录下。</p>
                 </li>
-            </ol>
+            </ol>-->
+            <div class="footer">
+                &copy;2011 demix.github.com
+            </div>
         </div>
     </body>
 </html>
