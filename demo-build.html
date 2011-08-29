@@ -8,8 +8,9 @@
 
         <script type="text/javascript" src="build/boot.js"></script>
         <script type="text/javascript">
-            require('core' , function(core){
+            require(['core', 'main']  , function(core,main){
             alert(core.name);
+            alert(main.one)
             });
         </script>
     </body>

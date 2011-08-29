@@ -2,7 +2,8 @@
     "name":"",
     "version":"0.1.1",
     "parent":"lib/modules.js",
-    "pyjsdir": "src",
+    "pyjsdir": "src",   
+
     "replace":{
         "local":{
             "js_url":"http://demix.baidu.com/PyJs/build/"
